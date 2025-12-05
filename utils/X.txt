@@ -1,0 +1,370 @@
+cat > /root/NEURO_CHK/handlers/menu_handler.py << 'EOF'
+# /root/NEURO_CHK/handlers/menu_handler.py
+from telegram import Update, InlineKeyboardMarkup, InlineKeyboardButton
+from telegram.ext import ContextTypes
+from datetime import datetime
+
+async def main_menu(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    """Show main menu with options"""
+    keyboard = [
+        [InlineKeyboardButton("📊 Check NeuroSnare", callback_data="check_neuro")],
+        [InlineKeyboardButton("🌐 Gateways", callback_data="gateways")],
+        [InlineKeyboardButton("⚡ Advance", callback_data="advance")],
+        [InlineKeyboardButton("👤 Credits", callback_data="credits")]
+    ]
+    reply_markup = InlineKeyboardMarkup(keyboard)
+    
+    message_text = (
+        "🔮 *NeuroSnare Checker v6.3*\n\n"
+        "*Main Menu*\n"
+        "Select an option below:"
+    )
+    
+    if update.callback_query:
+        await update.callback_query.answer()
+        await update.callback_query.edit_message_text(
+            text=message_text,
+            reply_markup=reply_markup,
+            parse_mode='Markdown'
+        )
+    else:
+        await update.message.reply_text(
+            text=message_text,
+            reply_markup=reply_markup,
+            parse_mode='Markdown'
+        )
+
+async def button_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    """Handle button callbacks from the menu"""
+    query = update.callback_query
+    await query.answer()
+    
+    callback_data = query.data
+    
+    if callback_data == "check_neuro":
+        keyboard = [
+            [InlineKeyboardButton("🔍 Quick Check", callback_data="quick_check")],
+            [InlineKeyboardButton("📈 Detailed Analysis", callback_data="detailed_check")],
+            [InlineKeyboardButton("📊 Batch Check", callback_data="batch_check")],
+            [InlineKeyboardButton("⬅️ Back to Menu", callback_data="back_to_menu")]
+        ]
+        reply_markup = InlineKeyboardMarkup(keyboard)
+        await query.edit_message_text(
+            text="📊 *NeuroSnare Check*\n\n"
+                 "Select check type:\n"
+                 "• Quick Check - Fast verification\n"
+                 "• Detailed Analysis - Full report\n"
+                 "• Batch Check - Multiple IDs at once",
+            reply_markup=reply_markup,
+            parse_mode='Markdown'
+        )
+    
+    elif callback_data == "gateways":
+        keyboard = [
+            [InlineKeyboardButton("🔗 SLT", callback_data="gateway_slt")],
+            [InlineKeyboardButton("💀 CARNAGE", callback_data="gateway_carnage")],
+            [InlineKeyboardButton("💳 0.5$ STRIPE", callback_data="gateway_stripe_0.5")],
+            [InlineKeyboardButton("💳 2$ STRIPE", callback_data="gateway_stripe_2")],
+            [InlineKeyboardButton("💳 10$ STRIPE", callback_data="gateway_stripe_10")],
+            [InlineKeyboardButton("⬅️ Back to Menu", callback_data="back_to_menu")]
+        ]
+        reply_markup = InlineKeyboardMarkup(keyboard)
+        await query.edit_message_text(
+            text="🌐 *Gateways*\n\n"
+                 "Available payment gateways:\n"
+                 "• SLT - Sri Lanka Telecom gateway\n"
+                 "• CARNAGE - Premium gateway\n"
+                 "• STRIPE - Various amounts available",
+            reply_markup=reply_markup,
+            parse_mode='Markdown'
+        )
+    
+    elif callback_data == "advance":
+        keyboard = [
+            [InlineKeyboardButton("🔧 GEN", callback_data="advance_gen")],
+            [InlineKeyboardButton("🛡️ VBV", callback_data="advance_vbv")],
+            [InlineKeyboardButton("🔢 Find BIN", callback_data="advance_find_bin")],
+            [InlineKeyboardButton("📊 Stats", callback_data="advance_stats")],
+            [InlineKeyboardButton("🔐 Security Check", callback_data="advance_security")],
+            [InlineKeyboardButton("⬅️ Back to Menu", callback_data="back_to_menu")]
+        ]
+        reply_markup = InlineKeyboardMarkup(keyboard)
+        await query.edit_message_text(
+            text="⚡ *Advance Tools*\n\n"
+                 "Advanced features:\n"
+                 "• GEN - Generate tools\n"
+                 "• VBV - Verified by Visa check\n"
+                 "• Find BIN - Bank Identification Number lookup\n"
+                 "• Stats - Statistical analysis\n"
+                 "• Security Check - Advanced security verification",
+            reply_markup=reply_markup,
+            parse_mode='Markdown'
+        )
+    
+    elif callback_data == "credits":
+        user = update.effective_user
+        user_id = user.id
+        username = f"@{user.username}" if user.username else "No username"
+        
+        # Check if user is admin (you can modify this logic)
+        admin_users = [7612918437]  # Add actual admin user IDs here
+        user_type = "👑 ADMIN" if user_id in admin_users else "👤 FREE USER"
+        
+        # Get current date
+        current_date = datetime.now().strftime("%Y-%m-%d")
+        
+        credits_text = (
+            f"👤 *User Credits*\n\n"
+            f"*User ID:* `{user_id}`\n"
+            f"*Username:* {username}\n"
+            f"*Status:* {user_type}\n"
+            f"*Date:* {current_date}\n\n"
+            f"*Plan Details:*\n"
+        )
+        
+        if user_id in admin_users:
+            credits_text += (
+                "✓ Unlimited checks\n"
+                "✓ All gateways unlocked\n"
+                "✓ Advance tools access\n"
+                "✓ Priority support\n"
+                "✓ No rate limits\n"
+                "🔑 *Admin privileges*"
+            )
+            keyboard = [
+                [InlineKeyboardButton("🛠️ Admin Panel", callback_data="admin_panel")],
+                [InlineKeyboardButton("⬅️ Back to Menu", callback_data="back_to_menu")]
+            ]
+        else:
+            credits_text += (
+                "✓ 10 checks/day\n"
+                "✓ Basic gateways\n"
+                "✓ Limited tools\n"
+                "✗ No admin access\n"
+                "✗ Rate limited\n\n"
+                "💎 *Upgrade to premium for full access*"
+            )
+            keyboard = [
+                [InlineKeyboardButton("💎 Upgrade", callback_data="upgrade")],
+                [InlineKeyboardButton("⬅️ Back to Menu", callback_data="back_to_menu")]
+            ]
+        
+        reply_markup = InlineKeyboardMarkup(keyboard)
+        await query.edit_message_text(
+            text=credits_text,
+            reply_markup=reply_markup,
+            parse_mode='Markdown'
+        )
+    
+    elif callback_data == "back_to_menu":
+        await main_menu(update, context)
+    
+    # Gateway handlers
+    elif callback_data == "gateway_slt":
+        keyboard = [[InlineKeyboardButton("⬅️ Back to Gateways", callback_data="gateways")]]
+        reply_markup = InlineKeyboardMarkup(keyboard)
+        await query.edit_message_text(
+            text="🔗 *SLT Gateway*\n\n"
+                 "Sri Lanka Telecom Gateway\n\n"
+                 "*Features:*\n"
+                 "• Local payments\n"
+                 "• Instant processing\n"
+                 "• High success rate\n"
+                 "• Low fees\n\n"
+                 "*Status:* ✅ Active",
+            reply_markup=reply_markup,
+            parse_mode='Markdown'
+        )
+    
+    elif callback_data == "gateway_carnage":
+        keyboard = [[InlineKeyboardButton("⬅️ Back to Gateways", callback_data="gateways")]]
+        reply_markup = InlineKeyboardMarkup(keyboard)
+        await query.edit_message_text(
+            text="💀 *CARNAGE Gateway*\n\n"
+                 "Premium International Gateway\n\n"
+                 "*Features:*\n"
+                 "• Worldwide access\n"
+                 "• High limits\n"
+                 "• Advanced security\n"
+                 "• 24/7 support\n\n"
+                 "*Status:* ✅ Active",
+            reply_markup=reply_markup,
+            parse_mode='Markdown'
+        )
+    
+    elif callback_data == "gateway_stripe_0.5":
+        keyboard = [[InlineKeyboardButton("⬅️ Back to Gateways", callback_data="gateways")]]
+        reply_markup = InlineKeyboardMarkup(keyboard)
+        await query.edit_message_text(
+            text="💳 *0.5$ STRIPE Gateway*\n\n"
+                 "Micro-payment Gateway\n\n"
+                 "*Features:*\n"
+                 "• $0.50 minimum\n"
+                 "• Test payments\n"
+                 "• Quick verification\n"
+                 "• Low risk\n\n"
+                 "*Status:* ✅ Active",
+            reply_markup=reply_markup,
+            parse_mode='Markdown'
+        )
+    
+    elif callback_data == "gateway_stripe_2":
+        keyboard = [[InlineKeyboardButton("⬅️ Back to Gateways", callback_data="gateways")]]
+        reply_markup = InlineKeyboardMarkup(keyboard)
+        await query.edit_message_text(
+            text="💳 *2$ STRIPE Gateway*\n\n"
+                 "Standard Payment Gateway\n\n"
+                 "*Features:*\n"
+                 "• $2.00 minimum\n"
+                 "• Balance check\n"
+                 "• Medium risk\n"
+                 "• Good success rate\n\n"
+                 "*Status:* ✅ Active",
+            reply_markup=reply_markup,
+            parse_mode='Markdown'
+        )
+    
+    elif callback_data == "gateway_stripe_10":
+        keyboard = [[InlineKeyboardButton("⬅️ Back to Gateways", callback_data="gateways")]]
+        reply_markup = InlineKeyboardMarkup(keyboard)
+        await query.edit_message_text(
+            text="💳 *10$ STRIPE Gateway*\n\n"
+                 "Premium Payment Gateway\n\n"
+                 "*Features:*\n"
+                 "• $10.00 minimum\n"
+                 "• High balance\n"
+                 "• Low security\n"
+                 "• Best success rate\n\n"
+                 "*Status:* ✅ Active",
+            reply_markup=reply_markup,
+            parse_mode='Markdown'
+        )
+    
+    # Advance handlers
+    elif callback_data == "advance_gen":
+        keyboard = [[InlineKeyboardButton("⬅️ Back to Advance", callback_data="advance")]]
+        reply_markup = InlineKeyboardMarkup(keyboard)
+        await query.edit_message_text(
+            text="🔧 *GEN Tools*\n\n"
+                 "Generation Tools:\n\n"
+                 "• Card Generator\n"
+                 "• Account Generator\n"
+                 "• Proxy Generator\n"
+                 "• Email Generator\n"
+                 "• Identity Generator\n\n"
+                 "*Status:* 🔓 Available for Premium",
+            reply_markup=reply_markup,
+            parse_mode='Markdown'
+        )
+    
+    elif callback_data == "advance_vbv":
+        keyboard = [[InlineKeyboardButton("⬅️ Back to Advance", callback_data="advance")]]
+        reply_markup = InlineKeyboardMarkup(keyboard)
+        await query.edit_message_text(
+            text="🛡️ *VBV Check*\n\n"
+                 "Verified by Visa Checker\n\n"
+                 "*Features:*\n"
+                 "• VBV status check\n"
+                 "• Security code check\n"
+                 "• 3D Secure verification\n"
+                 "• Bypass methods\n\n"
+                 "*Status:* 🔓 Available for Premium",
+            reply_markup=reply_markup,
+            parse_mode='Markdown'
+        )
+    
+    elif callback_data == "advance_find_bin":
+        keyboard = [[InlineKeyboardButton("⬅️ Back to Advance", callback_data="advance")]]
+        reply_markup = InlineKeyboardMarkup(keyboard)
+        await query.edit_message_text(
+            text="🔢 *Find BIN*\n\n"
+                 "Bank Identification Number Lookup\n\n"
+                 "*Features:*\n"
+                 "• BIN database search\n"
+                 "• Bank identification\n"
+                 "• Country detection\n"
+                 "• Card type detection\n"
+                 "• Issuer information\n\n"
+                 "*Status:* 🔓 Available for Premium",
+            reply_markup=reply_markup,
+            parse_mode='Markdown'
+        )
+    
+    elif callback_data == "advance_stats":
+        keyboard = [[InlineKeyboardButton("⬅️ Back to Advance", callback_data="advance")]]
+        reply_markup = InlineKeyboardMarkup(keyboard)
+        await query.edit_message_text(
+            text="📊 *Statistics*\n\n"
+                 "Bot Usage Statistics:\n\n"
+                 "• Total checks: 1,234\n"
+                 "• Success rate: 87%\n"
+                 "• Active users: 567\n"
+                 "• Today's checks: 42\n"
+                 "• Premium users: 89\n\n"
+                 "*Updated:* Just now",
+            reply_markup=reply_markup,
+            parse_mode='Markdown'
+        )
+    
+    elif callback_data == "advance_security":
+        keyboard = [[InlineKeyboardButton("⬅️ Back to Advance", callback_data="advance")]]
+        reply_markup = InlineKeyboardMarkup(keyboard)
+        await query.edit_message_text(
+            text="🔐 *Security Check*\n\n"
+                 "Advanced Security Verification\n\n"
+                 "*Features:*\n"
+                 "• Proxy detection\n"
+                 "• VPN detection\n"
+                 "• Fraud score\n"
+                 "• Risk assessment\n"
+                 "• IP reputation\n\n"
+                 "*Status:* 🔓 Available for Premium",
+            reply_markup=reply_markup,
+            parse_mode='Markdown'
+        )
+    
+    # Other handlers
+    elif callback_data == "admin_panel":
+        keyboard = [
+            [InlineKeyboardButton("📊 Bot Stats", callback_data="admin_stats")],
+            [InlineKeyboardButton("👥 Users", callback_data="admin_users")],
+            [InlineKeyboardButton("🔧 Settings", callback_data="admin_settings")],
+            [InlineKeyboardButton("⬅️ Back to Credits", callback_data="credits")]
+        ]
+        reply_markup = InlineKeyboardMarkup(keyboard)
+        await query.edit_message_text(
+            text="🛠️ *Admin Panel*\n\n"
+                 "Administrator tools:\n"
+                 "• Bot Statistics\n"
+                 "• User Management\n"
+                 "• Bot Settings\n"
+                 "• Logs & Monitoring",
+            reply_markup=reply_markup,
+            parse_mode='Markdown'
+        )
+    
+    elif callback_data == "upgrade":
+        keyboard = [[InlineKeyboardButton("⬅️ Back to Credits", callback_data="credits")]]
+        reply_markup = InlineKeyboardMarkup(keyboard)
+        await query.edit_message_text(
+            text="💎 *Upgrade to Premium*\n\n"
+                 "*Benefits:*\n"
+                 "✓ Unlimited checks\n"
+                 "✓ All gateways unlocked\n"
+                 "✓ Advance tools access\n"
+                 "✓ Priority support\n"
+                 "✓ No rate limits\n\n"
+                 "*Contact admin for upgrade*",
+            reply_markup=reply_markup,
+            parse_mode='Markdown'
+        )
+    
+    else:
+        # Unknown callback data - return to main menu
+        await query.edit_message_text(
+            text=f"⚠️ Unknown command\n\n"
+                 f"Returning to main menu...",
+            parse_mode='Markdown'
+        )
+        await main_menu(update, context)
+EOF
