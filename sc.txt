@@ -1,0 +1,23 @@
+neurosnare_bot/
+├── main.py
+├── config.py
+├── utils/
+│   ├── __init__.py
+│   ├── user_data.py
+│   └── admin_utils.py
+├── handlers/
+│   ├── __init__.py
+│   ├── start_handler.py
+│   ├── menu_handler.py
+│   ├── stripe_handler.py
+│   ├── cg_handler.py
+│   ├── slt_handler.py
+│   ├── carnage_handler.py
+│   ├── generator_handler.py
+│   └── admin_handler.py
+└── gateways/
+    ├── __init__.py
+    ├── stripe_checker.py
+    ├── cg_checker.py
+    ├── slt_checker.py
+    └── carnage_checker.py
